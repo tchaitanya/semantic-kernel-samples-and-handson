@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 internal class KernelSettings
 {
-    public const string DefaultConfigFile = "config/AzureOpenAIConnectorConfig.json";
+    public const string DefaultConfigFile = "config/appsettings.json";
 
     [JsonPropertyName("endpointType")]
     public string EndpointType { get; set; } = EndpointTypes.TextCompletion;

@@ -12,7 +12,7 @@ This solution uses LLMs (Large language models) from Azure OpenAI. You need to h
 
 # Set up
 
-1. Add the required configurations in `config\AzureOpenAIConnectorConfig.json` file. 
+1. Add the required configurations in `config\appsettings.json` file. 
 1. Alternatively, you can configure user secrets in terminal as below. User secrets should be configured before running the applications. 
 ```
 dotnet add package Microsoft.Extensions.Configuration.UserSecrets

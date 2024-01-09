@@ -7,24 +7,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.Extensions.Azure;
+using Microsoft.SemanticKernel.Plugins.Core;
 
-/// <summary>
-/// Load the settings from the default config file or from user secrets.
-/// This will add the AI (LLM) or connector to the Kernel, which will process the requests.
-/// </summary>
-var connector = KernelSettings.LoadSettings();
 
-#region prompt_engineering_semantic_function
-// var kernelBuilder = Kernel.CreateBuilder()
-//                     .AddAzureOpenAIChatCompletion(
-//                         endpoint: connector.Endpoint,
-//                         apiKey: connector.ApiKey,
-//                         deploymentName: connector.DeploymentOrModelId
-//                     )
-//                     .Build();
+#region prompt_engineering
+
+Console.WriteLine("---------------------Initializing kernel with Connector settings--------------------");
+Kernel kernel = KernelBuilder.InitializeKernel();
+Console.WriteLine("---------------------Kernel initialized---------------------------");
 
 // Console.WriteLine("-----------------------------------------------------------------------------------");
-// Console.WriteLine("Example 1. Invoke the kernel with a prompt and display the result");
+// Console.WriteLine("Example 1. Invoke the kernel with a zero-shot prompt and display the result");
 // Console.WriteLine(await kernel.InvokePromptAsync("What color is the sky?"));
 // Console.WriteLine();
 
@@ -63,24 +56,49 @@ var connector = KernelSettings.LoadSettings();
 // KernelArguments chatIntentArgs = new() { { "request", "Can you send a very quick approval to the marketing team?" } };
 // Console.WriteLine(await kernel.InvokeAsync(getIntent, chatIntentArgs));
 
+// Console.WriteLine("-----------------------------------------------------------------------------------");
+// Console.WriteLine("Example 5. Loops in Handlebars templates");
+// // Add ConversationSummaryPlugin to the Kernel
+// KernelPlugin conversationSummaryPlugin = kernel.ImportPluginFromType<ConversationSummaryPlugin>();
+// // Create chat history
+// var getIntent = kernel.CreateFunctionFromPrompt(
+//     new()
+//     {
+//         Template = @"
+//         <message role=""system"">Instructions: What is the intent of this request?
+//         Do not explain the reasoning, just reply back with the intent. If you are unsure, reply with {{choices[0]}}.
+//         Choices: {{choices}}.</message>
+
+//         {{#each fewShotExamples}}
+//             {{#each this}}
+//                 <message role=""{{role}}"">{{content}}</message>
+//             {{/each}}
+//         {{/each}}
+
+//         {{ConversationSummaryPlugin-SummarizeConversation history}}
+
+//         <message role=""user"">{{request}}</message>
+//         <message role=""system"">Intent:</message>",
+//         TemplateFormat = "handlebars"
+//     },
+//     new HandlebarsPromptTemplateFactory()
+// );
+// Console.WriteLine($"\nOutput: {await kernel.InvokeAsync(getIntent, new KernelArguments() { { "request", "Can you send a very quick approval to the marketing team?" } })}\n");
+
+// TODO Add 2-3 more examples 
 #endregion
 
 #region plugins
-var kernel = Kernel.CreateBuilder()
-                    .AddAzureOpenAIChatCompletion(
-                        endpoint: connector.Endpoint,
-                        apiKey: connector.ApiKey,
-                        deploymentName: connector.DeploymentOrModelId
-                    )
-                    .AddAzureOpenAITextGeneration(
-                        endpoint: connector.Endpoint,
-                        apiKey: connector.ApiKey,
-                        deploymentName: connector.DeploymentOrModelId
-                    )
-                    .Build();
+
 Console.WriteLine("-----------------------------------------------------------------------------------");
-Console.WriteLine("Example 6. Load Plugins");
-var intentPlugin = kernel.ImportPluginFromPromptDirectory("Plugins/IntentPlugin", "GetIntent");
+Console.WriteLine("Example 1. Import and add Plugin to the Kernel");
+var intentPlugin = kernel.ImportPluginFromPromptDirectory("Plugins/IntentPlugins");
+KernelFunction getIntentFunction = kernel.Plugins.GetFunction("IntentPlugins", "GetIntent");
+var output = await kernel.InvokeAsync(getIntentFunction,
+                                        new KernelArguments() { 
+                                            { "request", "Can you send a very quick approval to the marketing team?" }
+                                        });
+Console.WriteLine($"Output: {output}");
 
 
 #endregion
