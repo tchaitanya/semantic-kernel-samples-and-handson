@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 
 internal static class KernelBuilder
@@ -16,14 +18,15 @@ internal static class KernelBuilder
     /// <exception cref="ArgumentException"></exception>
     internal static Kernel InitializeKernel()
     {
+        var builder = Kernel.CreateBuilder();
         Console.WriteLine($"Initializing kernel with {connector.ServiceType} connector");
         if (connector.ServiceType == ServiceTypes.AzureOpenAI)
         {
-            return InitializeAzureOpenAIKernel();
+            return InitializeAzureOpenAIKernel(builder);
         }
         else if (connector.ServiceType == ServiceTypes.OpenAI)
         {
-            return InitializeOpenAIKernel();
+            return InitializeOpenAIKernel(builder);
         }
         else
         {
@@ -36,32 +39,35 @@ internal static class KernelBuilder
     /// Initialize the kernel with the Azure OpenAI resource.
     /// </summary>
     /// <returns></returns>
-    private static Kernel InitializeAzureOpenAIKernel()
+    private static Kernel InitializeAzureOpenAIKernel(IKernelBuilder builder)
     {
-        var kernel = Kernel.CreateBuilder()
-                    .AddAzureOpenAIChatCompletion(
+        builder.Services.AddAzureOpenAIChatCompletion(
                         endpoint: connector.Endpoint,
                         apiKey: connector.ApiKey,
                         deploymentName: connector.DeploymentOrModelId
-                    )
-                    .Build();
-        return kernel;
+                    );
+
+        builder.Services.AddLogging(configure => configure.AddConsole());
+
+        return builder.Build();
     }
 
     /// <summary>
     /// Initialize the kernel with the OpenAI.
     /// </summary>
     /// <returns></returns>
-    private static Kernel InitializeOpenAIKernel()
+    private static Kernel InitializeOpenAIKernel(IKernelBuilder builder)
     {
-        var kernel = Kernel.CreateBuilder()
+        builder.Services
                     .AddOpenAIChatCompletion(
                         apiKey: connector.ApiKey,
                         modelId: connector.DeploymentOrModelId,
                         orgId: connector.OrgId,
                         serviceId: connector.ServiceId
-                    )
-                    .Build();
-        return kernel;
+                    );
+
+        builder.Services.AddLogging(configure => configure.AddConsole());
+
+        return builder.Build();
     }
 }
