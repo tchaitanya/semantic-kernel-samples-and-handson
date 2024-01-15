@@ -6,7 +6,7 @@
     <RootNamespace>semantic_kernel_samples_and_handson</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NoWarn>SKEXP0050</NoWarn>
+    <NoWarn>SKEXP0050, SKEXP0004</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,11 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.0.1" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.0.1-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.0.1" />
+    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+     <EmbeddedResource Include="Prompts\**\*.yaml" />
   </ItemGroup>
 
 </Project>
