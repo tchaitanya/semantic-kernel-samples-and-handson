@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Plugins.Core;
 
 internal static class KernelBuilder
 {
@@ -47,7 +48,14 @@ internal static class KernelBuilder
                         deploymentName: connector.DeploymentOrModelId
                     );
 
-        builder.Services.AddLogging(configure => configure.AddConsole());
+        // builder.Services.AddLogging(configure => configure.AddConsole().SetMinimumLevel(LogLevel.Trace));    
+        builder.Services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddFilter(level => false);
+            loggingBuilder.AddConsole();
+        });
+
+        builder.Plugins.AddFromType<MathPlugin>();
 
         return builder.Build();
     }

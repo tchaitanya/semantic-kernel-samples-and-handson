@@ -16,10 +16,18 @@ Console.WriteLine("---------------------Initializing kernel with Connector setti
 Kernel kernel = KernelBuilder.InitializeKernel();
 Console.WriteLine("---------------------Kernel initialized---------------------------");
 
-// Console.WriteLine("-----------------------------------------------------------------------------------");
-// Console.WriteLine("Example 1. Invoke the kernel with a zero-shot prompt and display the result");
-// Console.WriteLine(await kernel.InvokePromptAsync("What color is the sky?"));
-// Console.WriteLine();
+Console.WriteLine("-----------------------------------------------------------------------------------");
+Console.WriteLine("Example 1. Invoke the kernel with a zero-shot prompt and display the result");
+Console.WriteLine(await kernel.InvokePromptAsync("What are famous inventions of Nikolas Tesla?"));
+int answer = await kernel.InvokeAsync<int>(
+"MathPlugin", "Add",
+    new() {
+        { "value", 12 },
+        { "amount", 30 }
+    }
+);
+Console.WriteLine(answer);
+Console.WriteLine();
 
 // Console.WriteLine("-----------------------------------------------------------------------------------");
 // Console.WriteLine("Example 2. Invoke the kernel with a templated prompt and display the result");
