@@ -23,9 +23,10 @@ internal sealed class EmailPlugin
 
         return input switch
         {
-            "Jane" => "janedoe4321@example.com",
-            "Paul" => "paulsmith5678@example.com",
-            "Mary" => "maryjones8765@example.com",
+            "Dharani" => "dhmadupu@microsoft.com",
+            "Satwiki" => "satwikide@microsoft.com",
+            "Akash" => "akashchekka@microsoft.com",
+            "Chaitanya" => "cthalloory@microsoft.com",
             _ => "johndoe1234@example.com",
         };
     }

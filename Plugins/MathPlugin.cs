@@ -5,7 +5,10 @@ using Microsoft.SemanticKernel;
 
 namespace Plugins;
 
-internal sealed class MathPlugin
+/// <summary>
+/// A plugin that returns Math calculations to the AI.
+/// </summary>
+public class MathPlugin
 {
     [KernelFunction, Description("Take the square root of a number")]
     public static double Sqrt(

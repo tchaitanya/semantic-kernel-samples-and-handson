@@ -1,4 +1,5 @@
 using Microsoft.SemanticKernel;
+using Plugins;
 
 internal static class KernelBuilder
 {
@@ -38,14 +39,18 @@ internal static class KernelBuilder
     /// <returns></returns>
     private static Kernel InitializeAzureOpenAIKernel()
     {
-        var kernel = Kernel.CreateBuilder()
+        var kernelBuilder = Kernel.CreateBuilder()
                     .AddAzureOpenAIChatCompletion(
                         endpoint: connector.Endpoint,
                         apiKey: connector.ApiKey,
                         deploymentName: connector.DeploymentOrModelId
-                    )
-                    .Build();
-        return kernel;
+                    );
+                   
+        kernelBuilder.Plugins.AddFromType<MathPlugin>();
+        kernelBuilder.Plugins.AddFromType<TimeInformationPlugin>();
+        kernelBuilder.Plugins.AddFromType<EmailPlugin>();
+
+        return kernelBuilder.Build();
     }
 
     /// <summary>
