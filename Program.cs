@@ -16,8 +16,6 @@ Console.WriteLine("---------------------Initializing kernel with Connector setti
 Kernel kernel = KernelBuilder.InitializeKernel();
 Console.WriteLine("---------------------Kernel initialized---------------------------");
 
-#region prompt_engineering
-
 // Console.WriteLine("-----------------------------------------------------------------------------------");
 // Console.WriteLine("Example 1. Invoke the kernel with a templated prompt and display the result");
 // KernelArguments arguments = new() { { "request", "Send an approval email to the marketing team" } };
@@ -184,18 +182,20 @@ Console.WriteLine("---------------------Kernel initialized----------------------
 #endregion
 
 #region Plugins - Get Time Information
-// Console.WriteLine("-----------------------------------------------------------------------------------");
+Console.WriteLine("-----------------------------------------------------------------------------------");
+
+
 // Console.WriteLine("Native Function using Time Information Plugin");
+// KernelArguments arguments = new() { { "event", "India Republic Day" } };
 
 // Console.WriteLine("Example 1: Invoke the kernel with a prompt that asks the AI for information it cannot provide and may hallucinate");
-// KernelArguments kernelArguments1 = new() { { "event", "India Republic Day" } };
-// Console.WriteLine(await kernel.InvokePromptAsync("How many days until {{$event}}?", kernelArguments1));
-
+// Console.WriteLine(await kernel.InvokePromptAsync("How many days until {{$event}}?", arguments));
+// Console.ReadLine();
 
 // Console.WriteLine("Example 2: Invoke the kernel with a templated prompt that invokes a plugin and display the result");
-
 // //Use TimeInformation plugin
-// Console.WriteLine(await kernel.InvokePromptAsync("The current time is {{TimeInformationPlugin.GetCurrentUtcTime}}. How many days until {{$event}}?", kernelArguments1));
+// Console.WriteLine(await kernel.InvokePromptAsync("The current time is {{TimeInformationPlugin.GetCurrentUtcTime}}. How many days until {{$event}}?", arguments));
+// Console.ReadLine();
 
 // Console.WriteLine("Example 3: Invoke the kernel with a prompt and allow the AI to automatically invoke functions");
 
@@ -206,19 +206,20 @@ Console.WriteLine("---------------------Kernel initialized----------------------
 //     ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
 // };
 
-// Console.WriteLine(await kernel.InvokePromptAsync("The current time is {{TimeInformationPlugin.GetCurrentUtcTime}}. How many days until {{$event}}? Explain your thinking.", new(openAIPromptExecutionSettings)));
-
+// Console.WriteLine(await kernel.InvokePromptAsync("The current time is {{TimeInformationPlugin.GetCurrentUtcTime}}. How many days until {{$event}}? Explain your thinking.", 
+//                                                         new(openAIPromptExecutionSettings)));
+// Console.ReadLine();
 #endregion
 
 #region Native Functions using Math Plugin
 
-// Console.WriteLine("---------------------------Math Plugin--------------------------------------------------------");
-// Console.WriteLine("Example 1: Native Function using Math Plugin");
+Console.WriteLine("---------------------------Math Plugin--------------------------------------------------------");
+Console.WriteLine("Example 1: Native Function using Math Plugin");
 
-// // // Import the Math plugin
-// //kernel.ImportPluginFromPromptDirectory("Plugins","MathPlugin");
+// // Import the Math plugin
+//kernel.ImportPluginFromPromptDirectory("Plugins","MathPlugin");
 
-// //Get the function from the Math plugin
+//Get the function from the Math plugin
 // var mathKernelFunction = kernel.Plugins.GetFunction("MathPlugin", "Sqrt");
 
 // //Set the Arguments
@@ -231,54 +232,57 @@ Console.WriteLine("---------------------Kernel initialized----------------------
 // double functionResults = await kernel.InvokeAsync<double>(mathKernelFunction, kernelArguments);
 
 // Console.WriteLine($"The square root of 12 is {functionResults}.");
-
+// Console.ReadLine();
 #endregion
 
 #region Invoke Math Plugin using AI 
-// Console.WriteLine("-----------------------------------------------------------------------------------");
-// Console.WriteLine("Example 2: Invoke Math Plugin using AI");
+Console.WriteLine("-----------------------------------------------------------------------------------");
+Console.WriteLine("Example 2: Invoke Math Plugin using AI");
 
-// // Create chat history
-// ChatHistory chatHistory= [];
+// Create chat history
+ChatHistory chatHistory= [];
 
-// // Get chat completion service
-// var chatCompletionService1 = kernel.GetRequiredService<IChatCompletionService>();
+// Get chat completion service
+var chatCompletionService1 = kernel.GetRequiredService<IChatCompletionService>();
 
-// // Start the conversation
-// while (true)
-// {
-//     // Get user input
-//     Console.Write("User > ");
-//     chatHistory.AddUserMessage(Console.ReadLine()!);
+// Start the conversation
+while (true)
+{
+    // Get user input
+    Console.Write("User > ");
+    chatHistory.AddUserMessage(Console.ReadLine()!);
 
-//     // Enable auto function calling
-//     OpenAIPromptExecutionSettings openAIPromptExecutionSettings1 = new()
-//     {
-//         ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-//     };
+    // Enable auto function calling
+    OpenAIPromptExecutionSettings openAIPromptExecutionSettings1 = new()
+    {
+        ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+    };
 
-//     // Get the response from the AI
-//     var result = chatCompletionService1.GetStreamingChatMessageContentsAsync(
-//         chatHistory,
-//         executionSettings: openAIPromptExecutionSettings1,
-//         kernel: kernel);
+    // Get the response from the AI
+    var result = chatCompletionService1.GetStreamingChatMessageContentsAsync(
+        chatHistory,
+        executionSettings: openAIPromptExecutionSettings1,
+        kernel: kernel);
 
-//     // Stream the results
-//     string fullMessage = "";
-//     var first = true;
-//     await foreach (var content in result)
-//     {
-//         if (content.Role.HasValue && first)
-//         {
-//             Console.Write("Assistant > ");
-//             first = false;
-//         }
-//         Console.Write(content.Content);
-//         fullMessage += content.Content;
-//     }
-//     Console.WriteLine();
+    // Stream the results
+    string fullMessage = "";
+    var first = true;
+    await foreach (var content in result)
+    {
+        if (content.Role.HasValue && first)
+        {
+            Console.Write("Assistant > ");
+            first = false;
+        }
+        Console.Write(content.Content);
+        fullMessage += content.Content;
+    }
+    Console.WriteLine();
 
-//     // Add the message from the agent to the chat history
-//     chatHistory.AddAssistantMessage(fullMessage);
-// }
+    // Add the message from the agent to the chat history
+    chatHistory.AddAssistantMessage(fullMessage);
+}
+
+Console.ReadLine();
+Console.WriteLine("Thank you");
 #endregion
